@@ -1,0 +1,9 @@
+name: SlimefunItemAlias
+author: balugaq
+description: This is a Slimefun addon.
+main: com.balugaq.sia.SlimefunItemAlias
+website: https://github.com/balugaq/SlimefunItemAlias
+version: ${project.version}
+api-version: 1.17
+depend:
+  - Slimefun
