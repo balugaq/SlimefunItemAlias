@@ -3,28 +3,20 @@ package com.balugaq.sia.injectors;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Utils {
-    public static Set<String> injectedItem = new HashSet<>();
-    public static Set<String> injectedBlock = new HashSet<>();
-
-    public static void tagInjectedItem(String id) {
-        injectedItem.add(id);
+    public static final Map<String, SlimefunItem> fixedItems = new HashMap<>();
+    public static void addFixedItem(String id, SlimefunItem item) {
+        fixedItems.put(id, item);
     }
 
-    public static boolean taggedInjectedItem(String id) {
-        return injectedItem.contains(id);
-    }
-
-    public static void tagInjectedBlock(String id) {
-        injectedBlock.add(id);
-    }
-
-    public static boolean taggedInjectedBlock(String id) {
-        return injectedBlock.contains(id);
+    public static SlimefunItem getFixedItem(String id) {
+        return fixedItems.get(id);
     }
 
     @Nullable

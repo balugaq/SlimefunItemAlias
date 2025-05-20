@@ -10,25 +10,18 @@ import java.util.List;
 public class BlockInjector {
     public static void injectAll(String pluginName) {
         for (var group : SlimefunItemAlias.getInstance().getConfigManager().getInjects()) {
-            for (var item : group) {
-                Utils.tagInjectedBlock(item);
-            }
-
-            var common = Utils.getExactItem(group);
-            if (common != null) {
-                inject(common, group, pluginName);
-            }
+            inject(group, pluginName);
         }
     }
 
-    public static void inject(SlimefunItem common, List<String> ids, String pluginName) {
+    public static void inject(List<String> ids, String pluginName) {
         var c = new ArrayList<>(ids);
-        var items = Slimefun.getRegistry().getAllSlimefunItems();
-        for (var id : items.stream().map(SlimefunItem::getId).toList()) {
+        for (var id : Slimefun.getRegistry().getSlimefunItemIds().keySet()) {
             c.remove(id);
         }
+
         for (var id : c) {
-            Slimefun.getRegistry().getSlimefunItemIds().put(id, common);
+            Slimefun.getRegistry().getSlimefunItemIds().put(id, Utils.getFixedItem(id));
         }
 
         Rollback.addRollback(pluginName, () -> {

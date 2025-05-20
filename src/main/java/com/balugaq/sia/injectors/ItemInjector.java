@@ -3,6 +3,7 @@ package com.balugaq.sia.injectors;
 import com.balugaq.sia.SlimefunItemAlias;
 import com.balugaq.sia.interfaces.Compatible;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.core.attributes.DistinctiveItem;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import lombok.SneakyThrows;
@@ -15,18 +16,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 public class ItemInjector {
 
     @SneakyThrows
     public static void injectAll() {
         for (var group : SlimefunItemAlias.getInstance().getConfigManager().getInjects()) {
-            for (var item : group) {
-                Utils.tagInjectedItem(item);
-            }
             var item = Utils.getExactItem(group);
             if (item != null) {
-                implementDistinctive(item, new DistinctiveItem() {
+                var newItem = implementDistinctive(item, new DistinctiveItem() {
                     // Apply method
                     @Override
                     public boolean canStack(@NotNull ItemMeta m1, @NotNull ItemMeta m2) {
@@ -40,8 +39,24 @@ public class ItemInjector {
                         return item.getId();
                     }
                 });
+
+                var groupC = new ArrayList<>(group);
+                for (var id : Slimefun.getRegistry().getSlimefunItemIds().keySet()) {
+                    groupC.remove(id);
+                }
+
+                for (var id : groupC) {
+                    var fixed = fixedId(newItem, id);
+                    Utils.addFixedItem(id, fixed);
+                    Slimefun.getRegistry().getAllSlimefunItems().add(fixed);
+                    Slimefun.getRegistry().getSlimefunItemIds().put(id, fixed);
+                }
             }
         }
+    }
+
+    public static SlimefunItem fixedId(SlimefunItem item, String id) {
+        return new SlimefunItem(item.getItemGroup(), new SlimefunItemStack(id, item.getItem()), item.getRecipeType(), item.getRecipe(), item.getRecipeOutput() == item.getItem() ? new SlimefunItemStack(id, item.getItem()) : item.getRecipeOutput());
     }
 
     public static SlimefunItem implementDistinctive(SlimefunItem original, DistinctiveItem distinctive) throws Exception {
